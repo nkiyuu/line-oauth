@@ -1,41 +1,29 @@
-'use strict'
+const http = require('http');
+const fs = require('fs');
+const server = http.createServer();
 
-import http from 'http';
-import url from 'url';
-import fs from 'fs';
-import { Server } from 'net';
-
-const httpServer = http.createServer();
-
-// HTMLを返す
-function renderHTML(res, html) {
-  const template = fs.readFile(`./template/${html}`, 'utf-8', (err, data) => {
-    res.writeHead(200, {
-      'conten-Type': 'text/html'
-    });
-
-    res.write(data);
-    res.end(`${html} has already sent to browser`);
-  })
-}
-
-httpServer.on('request', (req, res) => {
-  const Response = {
-    "renderIndex": renderHTML(res, 'index.html'),
-    "renderLogin": renderHtml(res, 'login.html'),
-  },
-
-  const uri = uri.parse(req.url).pathname
-
-  switch (uri) {
-    case "/" :
-      Response.renderIndex;
-      return;
-    case "/login" :
-      Response.renderLogin;
-      return;
-  }
-})
-
-httpServer.listen(8080);
-console.log()
+server.on('request', function(req, res) {
+  switch (req.url) {
+    case '/index':
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      fs.readFile(`./templates/index.html`, 'utf-8', (err, data) =>{
+        res.write(data);
+        res.end();
+      })
+      break;
+    case '/login':
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      fs.readFile(`./templates/login.html`, 'utf-8', (err, data) =>{
+        res.write(data);
+        res.end();
+      })
+      break;
+    default:
+      res.writeHead(404, {'Content-Type': 'text/plain'});
+      res.write("404 not found");
+      res.end();
+      break;
+    }
+});
+server.listen(8080);
+console.log("server listening ...");
